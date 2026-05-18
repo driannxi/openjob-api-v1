@@ -1,20 +1,8 @@
-import express from 'express';
+import server from "./server/index.js";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const host = process.env.HOST;
+const port = process.env.PORT;
 
-// Middleware untuk membaca JSON (penting untuk API)
-app.use(express.json());
-
-// Endpoint dasar (Route)
-app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Halo! Server Express kamu sudah berjalan dengan lancar 🚀'
-  });
-});
-
-// Menjalankan server
-app.listen(PORT, () => {
-  console.log(`Server berjalan di: http://localhost:${PORT}`);
+server.listen(port, () => {
+  console.log(`Server running at http://${host}:${port}`);
 });
