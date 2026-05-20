@@ -1,4 +1,4 @@
-import UserRepositories from "../repositories/user-repositories.js";
+import UserRepositories from "../repositories/users-repositories.js";
 import response from "../../../utils/response.js";
 import { InvariantError, NotFoundError } from "../../../exceptions/index.js";
 

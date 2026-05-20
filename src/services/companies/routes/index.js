@@ -5,7 +5,7 @@ import {
   getCompanyById,
   updateCompanyById,
   deleteCompany,
-} from "../controller/company-controller.js";
+} from "../controller/companies-controller.js";
 import authenticateToken from "../../../middlewares/auth.js";
 import validate from "../../../middlewares/validate.js";
 import { companyPayloadSchema } from "../validator/schema.js";

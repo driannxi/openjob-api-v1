@@ -1,4 +1,4 @@
-import CompaniesRepositories from "../services/companies/repositories/company-repositories.js";
+import CompaniesRepositories from "../services/companies/repositories/companies-repositories.js";
 import { NotFoundError } from "../exceptions/index.js";
 
 export const checkCompanyExists = async (req, res, next) => {
