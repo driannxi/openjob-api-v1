@@ -1,4 +1,4 @@
-import CompaniesRepositories from "../repositories/company-repositories.js";
+import CompaniesRepositories from "../repositories/companies-repositories.js";
 import response from "../../../utils/response.js";
 import { InvariantError, NotFoundError } from "../../../exceptions/index.js";
 

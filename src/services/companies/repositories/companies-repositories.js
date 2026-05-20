@@ -53,11 +53,15 @@ class CompaniesRepositories {
   async updateCompanyById(id, { name, location, description }) {
     const updatedAt = new Date().toISOString();
 
+    // const query = {
+    //   text: `UPDATE companies 
+    //      SET name = $1, location = $2, description = $3, updated_at = $4 
+    //      WHERE id = $5 
+    //      RETURNING id, name, location, description`,
+    //   values: [name, location, description, updatedAt, id],
+    // };
     const query = {
-      text: `UPDATE companies 
-         SET name = $1, location = $2, description = $3, updated_at = $4 
-         WHERE id = $5 
-         RETURNING id, name, location, description`,
+      text: "UPDATE companies SET name = $1, location = $2, description = $3, updated_at = $4 WHERE id = $5 RETURNING id, name, location, description",
       values: [name, location, description, updatedAt, id],
     };
 
