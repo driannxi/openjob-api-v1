@@ -8,9 +8,9 @@ export const jobPayloadSchema = Joi.object({
   job_type: Joi.string().required(),
   experience_level: Joi.string().required(),
   location_type: Joi.string().required(),
-  location_city: Joi.string().required(),
-  salary_min: Joi.number().min(0).required(),
-  salary_max: Joi.number().min(Joi.ref("salary_min")).required(),
-  is_salary_visible: Joi.boolean().required(),
   status: Joi.string().valid("open", "close").required(),
+  location_city: Joi.string().optional().allow(null, ""),
+  salary_min: Joi.number().min(0).optional().allow(null),
+  salary_max: Joi.number().min(0).optional().allow(null),
+  is_salary_visible: Joi.boolean().optional().default(true),
 });

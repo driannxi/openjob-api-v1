@@ -36,27 +36,27 @@ export const up = (pgm) => {
       type: "VARCHAR(50)",
       notNull: true,
     },
-    location_city: {
-      type: "VARCHAR(100)",
-      notNull: true,
-    },
-    salary_min: {
-      type: "NUMERIC",
-      notNull: true,
-    },
-    salary_max: {
-      type: "NUMERIC",
-      notNull: true,
-    },
-    is_salary_visible: {
-      type: "BOOLEAN",
-      notNull: true,
-      default: true,
-    },
     status: {
       type: "VARCHAR(20)",
       notNull: true,
       default: "open",
+    },
+    location_city: {
+      type: "VARCHAR(100)",
+      notNull: false,
+    },
+    salary_min: {
+      type: "NUMERIC",
+      notNull: false,
+    },
+    salary_max: {
+      type: "NUMERIC",
+      notNull: false,
+    },
+    is_salary_visible: {
+      type: "BOOLEAN",
+      notNull: false,
+      default: true,
     },
     created_at: {
       type: "TIMESTAMP",
