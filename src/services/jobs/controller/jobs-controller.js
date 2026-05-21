@@ -13,11 +13,11 @@ export const createJob = async (req, res, next) => {
     job_type,
     experience_level,
     location_type,
-    location_city,
-    salary_min,
-    salary_max,
-    is_salary_visible,
     status,
+    location_city = null,
+    salary_min = null,
+    salary_max = null,
+    is_salary_visible = true,
   } = req.validated;
 
   const companyCheck = await CompaniesRepositories.getCompanyById(company_id);
@@ -47,11 +47,11 @@ export const createJob = async (req, res, next) => {
     job_type,
     experience_level,
     location_type,
+    status,
     location_city,
     salary_min,
     salary_max,
     is_salary_visible,
-    status,
   });
 
   if (!job) {
@@ -125,11 +125,11 @@ export const updateJobById = async (req, res, next) => {
     job_type,
     experience_level,
     location_type,
-    location_city,
-    salary_min,
-    salary_max,
-    is_salary_visible,
     status,
+    location_city = null,
+    salary_min = null,
+    salary_max = null,
+    is_salary_visible = true,
   } = req.validated;
 
   const companyCheck = await CompaniesRepositories.getCompanyById(company_id);
@@ -159,11 +159,11 @@ export const updateJobById = async (req, res, next) => {
     job_type,
     experience_level,
     location_type,
+    status,
     location_city,
     salary_min,
     salary_max,
     is_salary_visible,
-    status,
   });
 
   if (!updatedJob) {
