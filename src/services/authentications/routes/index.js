@@ -10,6 +10,7 @@ import {
   putAuthenticationPayloadSchema,
   deleteAuthenticationPayloadSchema,
 } from "../validator/schema.js";
+import authenticateToken from "../../../middlewares/auth.js";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.put(
 );
 router.delete(
   "/authentications",
+  authenticateToken,
   validate(deleteAuthenticationPayloadSchema),
   logout,
 );
