@@ -10,7 +10,10 @@ import {
 } from "../controller/jobs-controller.js";
 import authenticateToken from "../../../middlewares/auth.js";
 import validate from "../../../middlewares/validate.js";
-import { jobPayloadSchema } from "../validator/schema.js";
+import {
+  jobPayloadSchema,
+  updateJobPayloadSchema,
+} from "../validator/schema.js";
 
 const router = Router();
 
@@ -22,7 +25,7 @@ router.get("/jobs/:id", getJobById);
 router.put(
   "/jobs/:id",
   authenticateToken,
-  validate(jobPayloadSchema),
+  validate(updateJobPayloadSchema),
   updateJobById,
 );
 router.delete("/jobs/:id", authenticateToken, deleteJobById);

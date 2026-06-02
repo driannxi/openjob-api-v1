@@ -117,54 +117,7 @@ export const updateJobById = async (req, res, next) => {
     return next(new NotFoundError("Lowongan pekerjaan tidak ditemukan"));
   }
 
-  const {
-    company_id,
-    category_id,
-    title,
-    description,
-    job_type,
-    experience_level,
-    location_type,
-    status,
-    location_city = null,
-    salary_min = null,
-    salary_max = null,
-    is_salary_visible = true,
-  } = req.validated;
-
-  const companyCheck = await CompaniesRepositories.getCompanyById(company_id);
-  if (!companyCheck) {
-    return next(
-      new NotFoundError(
-        "Gagal memperbarui lowongan. Perusahaan tidak ditemukan.",
-      ),
-    );
-  }
-
-  const categoryCheck =
-    await CategoriesRepositories.getCategoryById(category_id);
-  if (!categoryCheck) {
-    return next(
-      new NotFoundError(
-        "Gagal memperbarui lowongan. Kategori tidak ditemukan.",
-      ),
-    );
-  }
-
-  const updatedJob = await JobsRepositories.updateJobById(id, {
-    company_id,
-    category_id,
-    title,
-    description,
-    job_type,
-    experience_level,
-    location_type,
-    status,
-    location_city,
-    salary_min,
-    salary_max,
-    is_salary_visible,
-  });
+  const updatedJob = await JobsRepositories.updateJobById(id, req.validated);
 
   if (!updatedJob) {
     return next(new InvariantError("Lowongan pekerjaan gagal diperbarui"));
