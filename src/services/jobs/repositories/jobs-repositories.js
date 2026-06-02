@@ -88,43 +88,25 @@ class JobsRepositories {
     return result.rows;
   }
 
-  async updateJobById(
-    id,
-    {
-      company_id,
-      category_id,
-      title,
-      description,
-      job_type,
-      experience_level,
-      location_type,
-      location_city,
-      salary_min,
-      salary_max,
-      is_salary_visible,
-      status,
-    },
-  ) {
+  async updateJobById(id, dataUpdate) {
     const updatedAt = new Date().toISOString();
+    const data = { ...dataUpdate, updated_at: updatedAt };
+
+    const keys = Object.keys(data);
+    if (keys.length === 0) return null;
+
+    const setClause = keys
+      .map((key, index) => `"${key}" = $${index + 1}`)
+      .join(", ");
+
+    const values = Object.values(data);
+
+    values.push(id);
+    const idPosition = values.length;
 
     const query = {
-      text: "UPDATE jobs SET company_id = $1, category_id = $2, title = $3, description = $4, job_type = $5, experience_level = $6, location_type = $7, location_city = $8, salary_min = $9, salary_max = $10, is_salary_visible = $11, status = $12, updated_at = $13 WHERE id = $14 RETURNING id, title, status",
-      values: [
-        company_id,
-        category_id,
-        title,
-        description,
-        job_type,
-        experience_level,
-        location_type,
-        location_city,
-        salary_min,
-        salary_max,
-        is_salary_visible,
-        status,
-        updatedAt,
-        id,
-      ],
+      text: `UPDATE jobs SET ${setClause} WHERE id = $${idPosition} RETURNING id, title, status`,
+      values: values,
     };
 
     const result = await this.pool.query(query);
