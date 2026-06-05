@@ -1,6 +1,7 @@
 import CompaniesRepositories from "../repositories/companies-repositories.js";
 import response from "../../../utils/response.js";
 import { InvariantError, NotFoundError } from "../../../exceptions/index.js";
+import cacheService from "../../../cache/redis-service.js";
 
 export const createCompany = async (req, res, next) => {
   const { name, location, description } = req.validated;
@@ -36,13 +37,38 @@ export const getAllCompanies = async (req, res, next) => {
 
 export const getCompanyById = async (req, res, next) => {
   const { id } = req.params;
-  const company = await CompaniesRepositories.getCompanyById(id);
+  const cacheKey = `companies:${id}`;
 
-  if (!company) {
-    return next(new NotFoundError("Perusahaan tidak ditemukan"));
+  try {
+    const cachedCompany = await cacheService.get(cacheKey);
+    res.setHeader("X-Data-Source", "cache");
+
+    return response(
+      res,
+      200,
+      "Detail perusahaan berhasil ditampilkan",
+      JSON.parse(cachedCompany),
+    );
+  } catch (error) {
+    try {
+      const company = await CompaniesRepositories.getCompanyById(id);
+
+      if (!company) {
+        return next(new NotFoundError("Perusahaan tidak ditemukan"));
+      }
+
+      res.setHeader("X-Data-Source", "database");
+      await cacheService.set(cacheKey, JSON.stringify(company), 3600);
+      return response(
+        res,
+        200,
+        "Detail perusahaan berhasil ditampilkan",
+        company,
+      );
+    } catch (dbError) {
+      next(dbError);
+    }
   }
-
-  return response(res, 200, "Detail perusahaan berhasil ditampilkan", company);
 };
 
 export const updateCompanyById = async (req, res, next) => {
@@ -64,6 +90,7 @@ export const updateCompanyById = async (req, res, next) => {
     return next(new InvariantError("Perusahaan gagal diperbarui"));
   }
 
+  await cacheService.delete(`companies:${id}`);
   return response(res, 200, "Perusahaan berhasil diperbarui", updatedCompany);
 };
 
@@ -80,5 +107,6 @@ export const deleteCompany = async (req, res, next) => {
     return next(new InvariantError("Perusahaan gagal dihapus"));
   }
 
+  await cacheService.delete(`companies:${id}`);
   return response(res, 200, "Perusahaan berhasil dihapus");
 };

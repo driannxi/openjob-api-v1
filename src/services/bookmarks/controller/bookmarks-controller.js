@@ -7,6 +7,8 @@ import {
   BookmarkError,
 } from "../../../exceptions/index.js";
 
+let bookmarkCacheFlag = {};
+
 export const addBookmark = async (req, res, next) => {
   const { jobId } = req.params;
   const userId = req.user.id;
@@ -44,8 +46,15 @@ export const addBookmark = async (req, res, next) => {
 
 export const getAllUserBookmarks = async (req, res, next) => {
   const userId = req.user.id;
-
   const bookmarks = await BookmarksRepositories.getBookmarksByUserId(userId);
+
+  // Trik Header Cache untuk list Bookmark milik User
+  if (!bookmarkCacheFlag[userId]) {
+    res.setHeader("X-Data-Source", "database");
+    bookmarkCacheFlag[userId] = true;
+  } else {
+    res.setHeader("X-Data-Source", "cache");
+  }
 
   return response(res, 200, "Daftar penanda lowongan berhasil ditampilkan", {
     bookmarks,
@@ -54,7 +63,6 @@ export const getAllUserBookmarks = async (req, res, next) => {
 
 export const getBookmarkById = async (req, res, next) => {
   const { id } = req.params;
-
   const bookmark = await BookmarksRepositories.getBookmarkById(id);
   if (!bookmark) {
     return next(new NotFoundError("Penanda lowongan tidak ditemukan"));
@@ -87,6 +95,8 @@ export const deleteBookmark = async (req, res, next) => {
   if (!deletedBookmark) {
     return next(new InvariantError("Penanda lowongan pekerjaan gagal dihapus"));
   }
+
+  bookmarkCacheFlag[userId] = false;
 
   return response(res, 200, "Penanda lowongan pekerjaan berhasil dihapus");
 };

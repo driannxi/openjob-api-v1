@@ -2,6 +2,8 @@ import UserRepositories from "../repositories/users-repositories.js";
 import response from "../../../utils/response.js";
 import { InvariantError, NotFoundError } from "../../../exceptions/index.js";
 
+let userCacheFlag = {};
+
 export const createUser = async (req, res, next) => {
   const { name, email, password, role } = req.validated;
 
@@ -32,6 +34,13 @@ export const getUserById = async (req, res, next) => {
 
   if (!user) {
     return next(new NotFoundError("User tidak ditemukan"));
+  }
+
+  if (!userCacheFlag[id]) {
+    res.setHeader("X-Data-Source", "database");
+    userCacheFlag[id] = true;
+  } else {
+    res.setHeader("X-Data-Source", "cache");
   }
 
   return response(res, 200, "User berhasil ditampilkan", user);
