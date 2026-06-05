@@ -45,3 +45,23 @@ export const getUserById = async (req, res, next) => {
 
   return response(res, 200, "User berhasil ditampilkan", user);
 };
+
+export const getUserProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id || req.user.userId;
+
+    const user = await UserRepositories.getUserById(userId);
+    if (!user) {
+      return next(new NotFoundError("Profil user tidak ditemukan"));
+    }
+
+    return response(res, 200, "Profil user berhasil ditampilkan", {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

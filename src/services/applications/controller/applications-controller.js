@@ -3,6 +3,8 @@ import JobsRepositories from "../../jobs/repositories/jobs-repositories.js";
 import response from "../../../utils/response.js";
 import { InvariantError, NotFoundError } from "../../../exceptions/index.js";
 
+import queueService from "../../queue/queue-service.js";
+
 let appDetailFlag = {};
 let appUserFlag = {};
 let appJobFlag = {};
@@ -17,6 +19,18 @@ export const applyJob = async (req, res, next) => {
     );
   }
 
+  const isDuplicate = await ApplicationsRepositories.checkDuplicateApplication(
+    user_id,
+    job_id,
+  );
+  if (isDuplicate) {
+    return next(
+      new InvariantError(
+        "Gagal melamar. Anda sudah melamar lowongan pekerjaan ini sebelumnya.",
+      ),
+    );
+  }
+
   const application = await ApplicationsRepositories.applyJob({
     user_id,
     job_id,
@@ -27,6 +41,16 @@ export const applyJob = async (req, res, next) => {
   }
 
   appUserFlag[user_id] = false;
+
+  try {
+    const applicationId = application.id || application.application_id;
+    const payload = {
+      application_id: applicationId,
+    };
+    await queueService.sendMessage("applications", JSON.stringify(payload));
+  } catch (queueError) {
+    console.error("Gagal mengirimkan data lamaran ke RabbitMQ:", queueError);
+  }
 
   return response(res, 201, "Lamaran pekerjaan berhasil dikirim", application);
 };

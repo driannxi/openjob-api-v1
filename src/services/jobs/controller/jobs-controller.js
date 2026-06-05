@@ -62,7 +62,9 @@ export const createJob = async (req, res, next) => {
 };
 
 export const getAllJobs = async (req, res, next) => {
-  const jobs = await JobsRepositories.getAllJobs();
+  const queryOptions = req.query;
+
+  const jobs = await JobsRepositories.getAllJobs(queryOptions);
 
   return response(res, 200, "Daftar lowongan pekerjaan berhasil ditampilkan", {
     jobs,

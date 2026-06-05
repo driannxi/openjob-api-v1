@@ -49,9 +49,39 @@ class JobsRepositories {
     return result.rows[0];
   }
 
-  async getAllJobs() {
+  async getAllJobs(queryOptions = {}) {
+    let sqlText = `
+      SELECT 
+        j.id, j.company_id, j.category_id, j.title, j.description, 
+        j.job_type, j.experience_level, j.location_type, j.status, 
+        j.created_at, j.updated_at, 
+        c.name AS company_name, cat.name AS category_name 
+      FROM jobs j 
+      LEFT JOIN companies c ON j.company_id = c.id 
+      LEFT JOIN categories cat ON j.category_id = cat.id 
+      WHERE 1=1
+    `;
+
+    const values = [];
+    let valueCounter = 1;
+
+    if (queryOptions.title) {
+      sqlText += ` AND j.title ILIKE $${valueCounter}`;
+      values.push(`%${queryOptions.title}%`);
+      valueCounter++;
+    }
+
+    if (queryOptions["company-name"]) {
+      sqlText += ` AND c.name ILIKE $${valueCounter}`;
+      values.push(`%${queryOptions["company-name"]}%`);
+      valueCounter++;
+    }
+
+    sqlText += " ORDER BY j.created_at DESC";
+
     const query = {
-      text: "SELECT j.*, c.name AS company_name, cat.name AS category_name FROM jobs j LEFT JOIN companies c ON j.company_id = c.id LEFT JOIN categories cat ON j.category_id = cat.id ORDER BY j.created_at DESC",
+      text: sqlText,
+      values: values,
     };
 
     const result = await this.pool.query(query);

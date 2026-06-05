@@ -1,6 +1,18 @@
 import { Pool } from "pg";
 import { nanoid } from "nanoid";
 
+const baseBookmarkSelectQuery = `
+    SELECT 
+      b.id, b.user_id, b.job_id, b.created_at AS bookmarked_at,
+      j.title, j.description, j.job_type, j.experience_level, j.location_type, 
+      j.status, j.created_at, j.updated_at, j.location_city, j.salary_min, 
+      j.salary_max, j.is_salary_visible, j.category_id,
+      c.name AS company_name
+    FROM bookmarks b
+    LEFT JOIN jobs j ON b.job_id = j.id
+    LEFT JOIN companies c ON j.company_id = c.id
+  `;
+
 class BookmarksRepositories {
   constructor() {
     this.pool = new Pool();
@@ -31,24 +43,21 @@ class BookmarksRepositories {
 
   async getBookmarksByUserId(userId) {
     const query = {
-      text: "SELECT b.id AS bookmark_id, b.created_at AS bookmarked_at, j.*, c.name AS company_name FROM bookmarks b LEFT JOIN jobs j ON b.job_id = j.id LEFT JOIN companies c ON j.company_id = c.id WHERE b.user_id = $1 ORDER BY b.created_at DESC",
+      text: `${baseBookmarkSelectQuery} WHERE b.user_id = $1 ORDER BY b.created_at DESC`,
       values: [userId],
     };
-
     const result = await this.pool.query(query);
     return result.rows;
   }
 
   async getBookmarkById(id) {
     const query = {
-      text: "SELECT b.id, b.user_id, b.job_id, b.created_at AS bookmarked_at, j.title, j.description, j.job_type, j.experience_level, j.location_type, j.location_city, j.salary_min, j.salary_max, j.is_salary_visible, j.status, c.name AS company_name FROM bookmarks b LEFT JOIN jobs j ON b.job_id = j.id LEFT JOIN companies c ON j.company_id = c.id WHERE b.id = $1",
+      text: `${baseBookmarkSelectQuery} WHERE b.id = $1`,
       values: [id],
     };
-
     const result = await this.pool.query(query);
     return result.rows[0];
   }
-
   async deleteBookmarkByUserAndJob(userId, jobId) {
     const query = {
       text: "DELETE FROM bookmarks WHERE user_id = $1 AND job_id = $2 RETURNING id",

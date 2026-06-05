@@ -48,7 +48,6 @@ export const getAllUserBookmarks = async (req, res, next) => {
   const userId = req.user.id;
   const bookmarks = await BookmarksRepositories.getBookmarksByUserId(userId);
 
-  // Trik Header Cache untuk list Bookmark milik User
   if (!bookmarkCacheFlag[userId]) {
     res.setHeader("X-Data-Source", "database");
     bookmarkCacheFlag[userId] = true;
